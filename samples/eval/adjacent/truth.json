@@ -1,0 +1,265 @@
+{
+  "scenario": "adjacent",
+  "title": "Three adjacent repeated calls: cluster merges them, alignment separates them",
+  "snapshot": {
+    "snapshot_key": "eval-adjacent",
+    "name": "相邻重复叫声",
+    "parser_version": "segment-parser/1.2.0",
+    "recognizer_versions": {
+      "old": "recognizer/1.4.0",
+      "new": "recognizer/2.0.0"
+    },
+    "recording_scopes": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:10:00Z"
+      }
+    ],
+    "noise_layers": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:10:00Z",
+        "layer": "quiet"
+      }
+    ],
+    "annotation_ranges": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:10:00Z",
+        "annotator": "annotator-1"
+      }
+    ],
+    "labels": [
+      {
+        "label_key": "L1",
+        "station_id": "S1",
+        "class_label": "chirp",
+        "start": "2026-11-10T00:02:00.00Z",
+        "end": "2026-11-10T00:02:00.80Z",
+        "annotator": "annotator-1"
+      },
+      {
+        "label_key": "L2",
+        "station_id": "S1",
+        "class_label": "chirp",
+        "start": "2026-11-10T00:02:01.00Z",
+        "end": "2026-11-10T00:02:01.80Z",
+        "annotator": "annotator-1"
+      },
+      {
+        "label_key": "L3",
+        "station_id": "S1",
+        "class_label": "chirp",
+        "start": "2026-11-10T00:02:02.00Z",
+        "end": "2026-11-10T00:02:02.80Z",
+        "annotator": "annotator-1"
+      }
+    ],
+    "segments": [
+      {
+        "segment_key": "O1",
+        "version_role": "old",
+        "station_id": "S1",
+        "class_label": "chirp",
+        "start": "2026-11-10T00:02:00.00Z",
+        "end": "2026-11-10T00:02:00.80Z",
+        "features": [
+          0.3,
+          0.1
+        ]
+      },
+      {
+        "segment_key": "N1",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "chirp",
+        "start": "2026-11-10T00:02:00.05Z",
+        "end": "2026-11-10T00:02:00.85Z",
+        "features": [
+          0.3,
+          0.1
+        ]
+      },
+      {
+        "segment_key": "O2",
+        "version_role": "old",
+        "station_id": "S1",
+        "class_label": "chirp",
+        "start": "2026-11-10T00:02:01.00Z",
+        "end": "2026-11-10T00:02:01.80Z",
+        "features": [
+          0.31,
+          0.1
+        ]
+      },
+      {
+        "segment_key": "N2",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "chirp",
+        "start": "2026-11-10T00:02:01.05Z",
+        "end": "2026-11-10T00:02:01.85Z",
+        "features": [
+          0.31,
+          0.1
+        ]
+      },
+      {
+        "segment_key": "O3",
+        "version_role": "old",
+        "station_id": "S1",
+        "class_label": "chirp",
+        "start": "2026-11-10T00:02:02.00Z",
+        "end": "2026-11-10T00:02:02.80Z",
+        "features": [
+          0.3,
+          0.11
+        ]
+      },
+      {
+        "segment_key": "N3",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "chirp",
+        "start": "2026-11-10T00:02:02.05Z",
+        "end": "2026-11-10T00:02:02.85Z",
+        "features": [
+          0.3,
+          0.11
+        ]
+      }
+    ]
+  },
+  "reports": [
+    {
+      "method": "cluster",
+      "publish": true,
+      "adopt": false
+    },
+    {
+      "method": "alignment",
+      "publish": true,
+      "adopt": true
+    }
+  ],
+  "expect": {
+    "reports": [
+      {
+        "method": "cluster",
+        "relation_counts": {
+          "complex": 1
+        },
+        "ambiguous_groups": 0,
+        "matches": [
+          {
+            "relation": "complex",
+            "old_keys": [
+              "O1",
+              "O2",
+              "O3"
+            ],
+            "new_keys": [
+              "N1",
+              "N2",
+              "N3"
+            ],
+            "label_keys": [
+              "L1",
+              "L2",
+              "L3"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          }
+        ],
+        "groups": [
+          {
+            "station_id": "S1",
+            "class_label": "chirp",
+            "noise_layer": "quiet",
+            "labels_total": 3,
+            "detected_old": 3,
+            "detected_new": 3,
+            "splits_old": 0,
+            "splits_new": 0,
+            "merges_old": 0,
+            "merges_new": 0,
+            "additions": 0,
+            "unannotated_seconds": 0.0
+          }
+        ]
+      },
+      {
+        "method": "alignment",
+        "relation_counts": {
+          "one_to_one": 3
+        },
+        "ambiguous_groups": 0,
+        "optimal_alignments": 1,
+        "matches": [
+          {
+            "relation": "one_to_one",
+            "old_keys": [
+              "O1"
+            ],
+            "new_keys": [
+              "N1"
+            ],
+            "label_keys": [
+              "L1"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          },
+          {
+            "relation": "one_to_one",
+            "old_keys": [
+              "O2"
+            ],
+            "new_keys": [
+              "N2"
+            ],
+            "label_keys": [
+              "L2"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          },
+          {
+            "relation": "one_to_one",
+            "old_keys": [
+              "O3"
+            ],
+            "new_keys": [
+              "N3"
+            ],
+            "label_keys": [
+              "L3"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          }
+        ],
+        "groups": [
+          {
+            "station_id": "S1",
+            "class_label": "chirp",
+            "noise_layer": "quiet",
+            "labels_total": 3,
+            "detected_old": 3,
+            "detected_new": 3,
+            "splits_old": 0,
+            "splits_new": 0,
+            "merges_old": 0,
+            "merges_new": 0,
+            "additions": 0,
+            "unannotated_seconds": 0.0
+          }
+        ]
+      }
+    ]
+  }
+}

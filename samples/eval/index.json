@@ -1,0 +1,30 @@
+{
+  "reseg3": {
+    "title": "One long call re-sliced into three segments by the new recognizer",
+    "labels": 1,
+    "segments_old": 1,
+    "segments_new": 3,
+    "reports": 2
+  },
+  "adjacent": {
+    "title": "Three adjacent repeated calls: cluster merges them, alignment separates them",
+    "labels": 3,
+    "segments_old": 3,
+    "segments_new": 3,
+    "reports": 2
+  },
+  "rain": {
+    "title": "Rain noise layer: false positives grouped by layer, unannotated time listed separately",
+    "labels": 3,
+    "segments_old": 2,
+    "segments_new": 6,
+    "reports": 2
+  },
+  "tied": {
+    "title": "Equal-cost alignments preserved as ambiguity (2 ties -> 4 optimal decompositions)",
+    "labels": 3,
+    "segments_old": 3,
+    "segments_new": 3,
+    "reports": 2
+  }
+}

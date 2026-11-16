@@ -26,6 +26,7 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False
 
 def init_db() -> None:
     # Import models for their side effect: register tables on Base.metadata.
+    from . import eval_models as _eval_models  # noqa: F401
     from . import models as _models  # noqa: F401
 
     Base.metadata.create_all(engine)

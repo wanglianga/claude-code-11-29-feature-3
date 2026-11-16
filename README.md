@@ -3,6 +3,10 @@
 把不同台站听到的同一次声响归并为**同一事件**，给出发生位置、发生时间与仍不确定的候选范围，
 避免"一只动物被四台站听到"被统计成四次活动。
 
+服务同时提供**识别器升级评估**子系统（`/eval/*`，见第 10 节）：把台站端识别器新旧两版的
+片段输出与完整人工标注层冻结成一份不可变快照，区分"真正的新检出"与"旧声响被重新切片"，
+并按台站 × 声类 × 噪声层给出新增、漏检、误检、拆分、合并的区间估计。
+
 - 技术栈：Python 3.12 / FastAPI / PostgreSQL 18 / SQLAlchemy 2 / NumPy
 - 交付形态：**后端服务**（无前端页面），因此提供 OpenAPI 3.1 文档与 Swagger UI
 - 全部数据为**虚构平面坐标与模拟台站**，不依赖真实硬件，结果**不用于预警**
@@ -86,11 +90,13 @@ PGPASSWORD=ccdev /opt/postgresql-18/bin/psql -h 127.0.0.1 -U ccdev -d postgres \
 ### 2.3 一键演示 + 自检
 
 ```bash
-BASE=http://127.0.0.1:8000 ./scripts/demo.sh
+BASE=http://127.0.0.1:8000 ./scripts/demo.sh        # 观测归并五个场景
+BASE=http://127.0.0.1:8000 ./scripts/demo_eval.sh   # 识别器升级评估四个场景
 ```
 
-该脚本对五个内置场景逐个执行：重置 → 模拟台站分批上传 → 运行处理 → 独立校验，
-最后打印每条检查的通过情况。也可以手动分步执行（见第 5 节）。
+观测归并脚本对五个内置场景逐个执行：重置 → 模拟台站分批上传 → 运行处理 → 独立校验，
+最后打印每条检查的通过情况。评估脚本对四个评估场景逐个执行：冻结快照 → 计算/发布/
+采用报告 → 独立校验（含来源回查与未标注时长单列）。也可以手动分步执行（见第 5、10.4 节）。
 
 ---
 
@@ -119,24 +125,31 @@ PGPASSWORD=ccdev /opt/postgresql-18/bin/psql -h 127.0.0.1 -U ccdev -d postgres \
 ## 4. 验证方式（实际执行过的）
 
 ```bash
-# 1) 单元 + 集成 + 接口契约 + 独立校验器，共 59 个用例
+# 1) 单元 + 集成 + 接口契约 + 独立校验器，共 89 个用例
 .venv/bin/python -m pytest
-# 59 passed
+# 89 passed
 
-# 2) 五个样例场景的端到端自检（真实 HTTP 服务）
+# 2) 五个观测归并场景的端到端自检（真实 HTTP 服务）
 BASE=http://127.0.0.1:8000 ./scripts/demo.sh
 
-# 说明：上面的 pytest 含 6 个由独立校验器驱动的端到端用例、5 个接口契约用例；
-# demo.sh 使用真实 uvicorn 进程 + 真实 PostgreSQL，逐个场景输出校验结论。
+# 3) 四个识别器升级评估场景的端到端自检（真实 HTTP 服务）
+BASE=http://127.0.0.1:8000 ./scripts/demo_eval.sh
 
-# 3) 单独校验某个已加载场景
+# 说明：pytest 含 6 个由独立校验器驱动的端到端用例、5 个接口契约用例、
+# 30 个评估子系统用例；demo.sh / demo_eval.sh 使用真实 uvicorn 进程 +
+# 真实 PostgreSQL，逐个场景输出校验结论。
+
+# 4) 单独校验某个已加载场景
 .venv/bin/python -m verifier.verify --scenario reboot \
   --base-url http://127.0.0.1:8000 --api-key dev-api-key
+.venv/bin/python -m verifier.verify_eval --scenario tied \
+  --base-url http://127.0.0.1:8000 --api-key dev-api-key
 
-# 4) 重新生成样例真值文件
+# 5) 重新生成样例真值文件
 .venv/bin/python scripts/generate_samples.py
+.venv/bin/python scripts/generate_eval_samples.py
 
-# 5) 重新导出 OpenAPI 文档
+# 6) 重新导出 OpenAPI 文档
 .venv/bin/python scripts/export_openapi.py
 ```
 
@@ -221,6 +234,9 @@ curl -s "$BASE/events/1/anchors" -H "$KEY" | python -m json.tool
 samples/
   index.json            五个场景的概要
   <scenario>/truth.json 台站位置、每 boot 真值时钟模型、校准声源时刻、上传波次、真实事件
+  eval/
+    index.json          四个评估场景的概要
+    <scenario>/truth.json 评估快照载荷（范围/标签/噪声层/两版片段/解析版本）与期望分类
 ```
 
 `truth.json` 中的 `waves[].records` 就是模拟器实际 POST 的载荷；`waves[].truth` 记录每条
@@ -298,7 +314,7 @@ samples/
 ```
 app/
   main.py          FastAPI 应用、鉴权中间件、OpenAPI 定制
-  api.py           全部路由
+  api.py           观测归并路由
   schemas.py       Pydantic 请求/响应
   models.py        SQLAlchemy 表结构
   db.py            引擎与会话
@@ -311,17 +327,30 @@ app/
   association.py   候选团枚举
   solver.py        互斥集合划分求解与并列检测
   pipeline.py      阶段化处理、检查点、定稿、修订
+  eval_models.py   评估子系统表结构（快照、报告、匹配、分组）
+  eval_schemas.py  评估子系统请求/响应
+  eval_snapshot.py 快照冻结、内容哈希、覆盖率与未标注时长
+  eval_match.py    连通片段簇 + 有序边界序列动态对齐（保留同代价歧义）
+  eval_truth.py    人工标注层真值估计与 Wilson 区间
+  eval_report.py   报告装配、版本、发布与采用
+  eval_api.py      评估子系统路由（/eval/*）
 simulator/
   scenarios.py     五个虚构场景与每个 boot 的时钟模型
   run_simulator.py 真值生成、可暂停的分波上传、重放/冲突注入
+  eval_scenarios.py 四个评估验收场景（快照载荷 + 期望分类）
+  run_eval_simulator.py 评估场景驱动器
 verifier/
-  verify.py        独立前向模型校验器（不引用 app/）
+  verify.py        观测归并独立前向模型校验器（不引用 app/）
+  verify_eval.py   评估子系统独立校验器（不引用 app/）
 scripts/
-  demo.sh          一键演示 + 自检
+  demo.sh          观测归并一键演示 + 自检
+  demo_eval.sh     识别器升级评估一键演示 + 自检
   generate_samples.py
+  generate_eval_samples.py
   export_openapi.py
-tests/             59 个用例（导入、校准、定位、关联、求解、流水线、校验器、接口契约）
-samples/           五个场景的真值文件
+tests/             89 个用例（导入、校准、定位、关联、求解、流水线、校验器、接口契约、评估）
+samples/           五个观测场景的真值文件
+samples/eval/      四个评估场景的快照与期望分类
 openapi.json       导出的 OpenAPI 3.1 文档
 Dockerfile / docker-compose.yml
 ```
@@ -346,3 +375,88 @@ Dockerfile / docker-compose.yml
 | `MIN_EVENT_STATIONS` | `2` | 事件最少台站数 |
 | `MAX_SOLUTION_OPTIONS` | `5` | 并列/备选分解上限 |
 | `HEARING_RADIUS_M` / `PROGRESS_MARGIN_S` | `1600` / `120` | 定稿判定 |
+
+---
+
+## 10. 识别器升级评估子系统（`/eval/*`）
+
+台站端识别器从 1.x 升到 2.x 后，新输出的片段里既有**真正的新检出**，也有**旧声响被重新
+切片**。本子系统把评估所需的全部输入冻结成一份**不可变快照**，用两种可互换的方法做
+新旧片段关系分类，再以完整人工标注层估计真值，输出按台站 × 声类 × 噪声层分组的
+区间估计报告；所有结论可回查来源，已发布采用的结论永不被覆盖。
+
+### 10.1 与需求的对应关系
+
+| 需求 | 实现位置 | 说明 |
+| --- | --- | --- |
+| 录音范围、人工标签、噪声条件、两版片段、解析版本构成不可变评价快照 | `POST /eval/snapshots`、`app/eval_snapshot.py` | 整个载荷做 SHA-256 内容哈希；同键同内容重放是幂等 no-op（200），同键不同内容拒绝（409），从不覆盖 |
+| 补标或标签修订另起报告版本，不覆盖已发布采用结论 | `revision_of` + `eval_reports.report_version` | 标签属于快照，修订即新快照（同 `series_id`）；新报告在该系列内递增版本号；已发布/已采用报告只增不改，采用历史完整保留（`GET /eval/series/{id}/adopted`） |
+| 连通片段簇法：时间覆盖 + 声学相似性形成连通簇，簇内判定一对多/多对一/独立 | `app/eval_match.py::cluster_groups` | 边 = 时间相交或间隙 ≤ `cluster_gap_us` 且特征距离 ≤ 上限；连通分量即簇；簇内 (旧 m, 新 n) → 1:1 / 拆分 / 合并 / 复杂 / 仅新 / 仅旧 |
+| 簇法弱点：相邻同类声可能被并入同簇 | `samples/eval/adjacent` | 3 个间隔 0.2 s 的相邻叫声被簇法并为 3:3 `complex` 簇（验收样例固定此行为） |
+| 动态对齐法：两版有序边界序列对齐，允许一次旧事件对应连续新事件段 | `app/eval_match.py::align_sequences` | 整数微秒代价 DP：跳过旧/新各 `skip_cost_us`，块移动（1:1、1:k 拆分、k:1 合并、k:l 复杂）代价 = 边界时间扭曲 + 重切罚项；块内片段必须时间相邻（防止跨越长静音的虚假合并），从而控制邻近事件误并 |
+| 多种同代价对齐必须保留为歧义 | `alignment_groups` + `eval_matches.alternatives` | 枚举全部最优对齐（仅跳过顺序不同的路径视为同一分解）；同一组片段存在多种最优分解时整组标记 `ambiguous`，全部分解存入 `alternatives`；`samples/eval/tied` 有 2×2=4 个最优分解 |
+| 真实性只能由完整人工标注层估计，未标注时长单列 | `app/eval_truth.py` | 指标只在标注覆盖区间内计算；未标注时长与落入其中的片段按噪声层单列（`unannotated_seconds`、`unannotated_segments_*`），不并入任何比率 |
+| 按台站、声类、噪声层给出新增/漏检/误检/拆分/合并的区间估计 | `eval_report_groups` | 每组给出计数、比率与 Wilson 得分区间（默认 95%，`ci_level` 可调）；新增 = 新版检出而旧版漏检的标签，另记倒退（旧版检出而新版漏检） |
+| 分类与来源回查 | `GET /eval/reports/{id}/matches[/{group_key}]` | 每个关系组记录新旧片段键、涉及的人工标签键、真值状态与全部同代价备选分解；报告分组计数可由匹配行与标签完整复原 |
+
+### 10.2 数据模型与生命周期
+
+```
+POST /eval/snapshots            冻结快照（幂等；同键异内容 409）
+  ├─ recording_scopes           录音范围（每台站）
+  ├─ noise_layers               噪声层（同台站内不重叠，保证归属唯一）
+  ├─ annotation_ranges          完整人工标注范围（真值只能在这里估计）
+  ├─ labels                     人工标签（必须落在标注范围内）
+  ├─ segments                   两版识别器片段（version_role = old|new）
+  └─ parser_version             解析版本（片段文件已被解析层归一到参考时间）
+
+POST /eval/snapshots/{key}/reports {"method": "cluster"|"alignment", "params": {...}}
+  → 计算报告：同 (快照, 方法, 参数) 重复请求幂等返回（200）；
+    输入真正变化时才在该系列内递增 report_version
+POST /eval/reports/{id}/publish 发布（结论冻结）
+POST /eval/reports/{id}/adopt   采用（需先发布；不清除历史采用记录）
+```
+
+报告参数（全部随报告冻结，可复算）：`cluster_gap_us`、`feature_distance_limit`、
+`skip_cost_us`、`reseg_penalty_us`、`align_max_gap_us`、`max_warp_us`、`max_block`、
+`max_alignments`、`ci_level`。
+
+### 10.3 验收样例（`samples/eval/`）
+
+| 场景 | 验收点 | 结果 |
+| --- | --- | --- |
+| `reseg3` 长声被三段切开 | 两种方法都判 1 旧 : 3 新为 `split`；真值层记新版拆分率 1.0（含 Wilson 区间）；匹配行回链标签 L1 | 28 项检查全过 |
+| `adjacent` 相邻重复叫声 | 簇法把 3 个相邻叫声并为 3:3 `complex`（弱点固化为预期）；对齐法保持 3 个 `one_to_one` | 30 项检查全过 |
+| `rain` 雨天噪声 | 雨层误检 2 条单列；静风层新增 1 条；未标注 300 s 与其中 1 条片段单列；补标后 `eval-rain-r2` 另起 v2，v1 已发布结论逐字节不变 | 34 项检查全过 |
+| `tied` 并列对齐 | 两处同代价（匹配 0.8 s ≡ 双跳过 0.8 s）→ 4 个最优分解全部保留，2 组标记 `ambiguous` 且备选分解齐全 | 32 项检查全过 |
+
+### 10.4 手动走查（curl）
+
+```bash
+KEY='X-API-Key: dev-api-key'
+BASE=http://127.0.0.1:8000
+
+# 加载验收场景（幂等，可重复执行）
+.venv/bin/python -m simulator.run_eval_simulator --scenario tied
+
+# 报告与分组区间估计
+curl -s "$BASE/eval/reports?snapshot_key=eval-tied" -H "$KEY" | python -m json.tool
+curl -s "$BASE/eval/reports/1" -H "$KEY" | python -m json.tool
+
+# 来源回查：歧义组的全部同代价备选分解
+curl -s "$BASE/eval/reports/1/matches?ambiguous=true" -H "$KEY" | python -m json.tool
+
+# 快照覆盖与未标注时长
+curl -s "$BASE/eval/snapshots/eval-rain" -H "$KEY" | python -m json.tool
+```
+
+### 10.5 已知边界（有意为之）
+
+- 簇法不感知次序，相邻同类声会被传递性并入同簇——这是该方法的固有弱点，
+  验收样例 `adjacent` 把它固定为预期行为；需要区分邻近事件时改用对齐法。
+- 对齐法的结果依赖时间扭曲与跳过代价的选择；代价随报告冻结，换一组代价即
+  新的报告版本，旧结论不受影响。
+- 歧义组不参与确定关系计数（`relation_counts`），单独计入 `ambiguous_groups`；
+  对齐数超过 `max_alignments` 时报告标记 `alignment_count_truncated`。
+- 真值比率只在完整标注层内估计；未标注时段与其中的片段永远单列，不参与任何比率。
+

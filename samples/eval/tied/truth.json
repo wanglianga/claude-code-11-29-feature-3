@@ -1,0 +1,279 @@
+{
+  "scenario": "tied",
+  "title": "Equal-cost alignments preserved as ambiguity (2 ties -> 4 optimal decompositions)",
+  "snapshot": {
+    "snapshot_key": "eval-tied",
+    "name": "并列对齐（同代价歧义）",
+    "parser_version": "segment-parser/1.2.0",
+    "recognizer_versions": {
+      "old": "recognizer/1.4.0",
+      "new": "recognizer/2.0.0"
+    },
+    "recording_scopes": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:10:00Z"
+      }
+    ],
+    "noise_layers": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:10:00Z",
+        "layer": "quiet"
+      }
+    ],
+    "annotation_ranges": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:10:00Z",
+        "annotator": "annotator-1"
+      }
+    ],
+    "labels": [
+      {
+        "label_key": "LA",
+        "station_id": "S1",
+        "class_label": "tick",
+        "start": "2026-11-10T00:01:39.9Z",
+        "end": "2026-11-10T00:01:41.1Z",
+        "annotator": "annotator-1"
+      },
+      {
+        "label_key": "LB",
+        "station_id": "S1",
+        "class_label": "tick",
+        "start": "2026-11-10T00:03:19.9Z",
+        "end": "2026-11-10T00:03:21.1Z",
+        "annotator": "annotator-1"
+      },
+      {
+        "label_key": "LC",
+        "station_id": "S1",
+        "class_label": "tick",
+        "start": "2026-11-10T00:06:39.9Z",
+        "end": "2026-11-10T00:06:41.1Z",
+        "annotator": "annotator-1"
+      }
+    ],
+    "segments": [
+      {
+        "segment_key": "OA",
+        "version_role": "old",
+        "station_id": "S1",
+        "class_label": "tick",
+        "start": "2026-11-10T00:01:40.0Z",
+        "end": "2026-11-10T00:01:41.0Z",
+        "features": [
+          0.1,
+          0.2
+        ]
+      },
+      {
+        "segment_key": "NA",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "tick",
+        "start": "2026-11-10T00:01:40.4Z",
+        "end": "2026-11-10T00:01:41.4Z",
+        "features": [
+          0.1,
+          0.2
+        ]
+      },
+      {
+        "segment_key": "OB",
+        "version_role": "old",
+        "station_id": "S1",
+        "class_label": "tick",
+        "start": "2026-11-10T00:03:20.0Z",
+        "end": "2026-11-10T00:03:21.0Z",
+        "features": [
+          0.1,
+          0.2
+        ]
+      },
+      {
+        "segment_key": "NB",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "tick",
+        "start": "2026-11-10T00:03:20.1Z",
+        "end": "2026-11-10T00:03:21.1Z",
+        "features": [
+          0.1,
+          0.2
+        ]
+      },
+      {
+        "segment_key": "OC",
+        "version_role": "old",
+        "station_id": "S1",
+        "class_label": "tick",
+        "start": "2026-11-10T00:06:40.0Z",
+        "end": "2026-11-10T00:06:41.0Z",
+        "features": [
+          0.1,
+          0.2
+        ]
+      },
+      {
+        "segment_key": "NC",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "tick",
+        "start": "2026-11-10T00:06:40.4Z",
+        "end": "2026-11-10T00:06:41.4Z",
+        "features": [
+          0.1,
+          0.2
+        ]
+      }
+    ]
+  },
+  "reports": [
+    {
+      "method": "alignment",
+      "publish": true,
+      "adopt": true
+    },
+    {
+      "method": "cluster",
+      "publish": true,
+      "adopt": false
+    }
+  ],
+  "expect": {
+    "reports": [
+      {
+        "method": "alignment",
+        "relation_counts": {
+          "one_to_one": 1
+        },
+        "ambiguous_groups": 2,
+        "optimal_alignments": 4,
+        "matches": [
+          {
+            "relation": "ambiguous",
+            "old_keys": [
+              "OA"
+            ],
+            "new_keys": [
+              "NA"
+            ],
+            "label_keys": [
+              "LA"
+            ],
+            "ambiguous": true,
+            "alternatives": 2
+          },
+          {
+            "relation": "one_to_one",
+            "old_keys": [
+              "OB"
+            ],
+            "new_keys": [
+              "NB"
+            ],
+            "label_keys": [
+              "LB"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          },
+          {
+            "relation": "ambiguous",
+            "old_keys": [
+              "OC"
+            ],
+            "new_keys": [
+              "NC"
+            ],
+            "label_keys": [
+              "LC"
+            ],
+            "ambiguous": true,
+            "alternatives": 2
+          }
+        ],
+        "groups": [
+          {
+            "station_id": "S1",
+            "class_label": "tick",
+            "noise_layer": "quiet",
+            "labels_total": 3,
+            "detected_old": 3,
+            "detected_new": 3,
+            "additions": 0,
+            "unannotated_seconds": 0.0
+          }
+        ]
+      },
+      {
+        "method": "cluster",
+        "relation_counts": {
+          "one_to_one": 3
+        },
+        "ambiguous_groups": 0,
+        "matches": [
+          {
+            "relation": "one_to_one",
+            "old_keys": [
+              "OA"
+            ],
+            "new_keys": [
+              "NA"
+            ],
+            "label_keys": [
+              "LA"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          },
+          {
+            "relation": "one_to_one",
+            "old_keys": [
+              "OB"
+            ],
+            "new_keys": [
+              "NB"
+            ],
+            "label_keys": [
+              "LB"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          },
+          {
+            "relation": "one_to_one",
+            "old_keys": [
+              "OC"
+            ],
+            "new_keys": [
+              "NC"
+            ],
+            "label_keys": [
+              "LC"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          }
+        ],
+        "groups": [
+          {
+            "station_id": "S1",
+            "class_label": "tick",
+            "noise_layer": "quiet",
+            "labels_total": 3,
+            "detected_old": 3,
+            "detected_new": 3,
+            "additions": 0,
+            "unannotated_seconds": 0.0
+          }
+        ]
+      }
+    ]
+  }
+}

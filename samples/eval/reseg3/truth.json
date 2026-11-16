@@ -1,0 +1,192 @@
+{
+  "scenario": "reseg3",
+  "title": "One long call re-sliced into three segments by the new recognizer",
+  "snapshot": {
+    "snapshot_key": "eval-reseg3",
+    "name": "长声被三段切开",
+    "parser_version": "segment-parser/1.2.0",
+    "recognizer_versions": {
+      "old": "recognizer/1.4.0",
+      "new": "recognizer/2.0.0"
+    },
+    "recording_scopes": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:10:00Z"
+      }
+    ],
+    "noise_layers": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:10:00Z",
+        "layer": "quiet"
+      }
+    ],
+    "annotation_ranges": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:10:00Z",
+        "annotator": "annotator-1"
+      }
+    ],
+    "labels": [
+      {
+        "label_key": "L1",
+        "station_id": "S1",
+        "class_label": "whoop",
+        "start": "2026-11-10T00:01:40.0Z",
+        "end": "2026-11-10T00:01:52.0Z",
+        "annotator": "annotator-1",
+        "note": "one long call"
+      }
+    ],
+    "segments": [
+      {
+        "segment_key": "O1",
+        "version_role": "old",
+        "station_id": "S1",
+        "class_label": "whoop",
+        "start": "2026-11-10T00:01:40.1Z",
+        "end": "2026-11-10T00:01:51.9Z",
+        "features": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "segment_key": "N1",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "whoop",
+        "start": "2026-11-10T00:01:40.1Z",
+        "end": "2026-11-10T00:01:44.0Z",
+        "features": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "segment_key": "N2",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "whoop",
+        "start": "2026-11-10T00:01:44.2Z",
+        "end": "2026-11-10T00:01:48.0Z",
+        "features": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "segment_key": "N3",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "whoop",
+        "start": "2026-11-10T00:01:48.2Z",
+        "end": "2026-11-10T00:01:51.9Z",
+        "features": [
+          0.5,
+          0.5
+        ]
+      }
+    ]
+  },
+  "reports": [
+    {
+      "method": "cluster",
+      "publish": true,
+      "adopt": false
+    },
+    {
+      "method": "alignment",
+      "publish": true,
+      "adopt": true
+    }
+  ],
+  "expect": {
+    "reports": [
+      {
+        "method": "cluster",
+        "relation_counts": {
+          "split": 1
+        },
+        "ambiguous_groups": 0,
+        "matches": [
+          {
+            "relation": "split",
+            "old_keys": [
+              "O1"
+            ],
+            "new_keys": [
+              "N1",
+              "N2",
+              "N3"
+            ],
+            "label_keys": [
+              "L1"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          }
+        ],
+        "groups": [
+          {
+            "station_id": "S1",
+            "class_label": "whoop",
+            "noise_layer": "quiet",
+            "labels_total": 1,
+            "detected_old": 1,
+            "detected_new": 1,
+            "splits_old": 0,
+            "splits_new": 1,
+            "additions": 0,
+            "unannotated_seconds": 0.0
+          }
+        ]
+      },
+      {
+        "method": "alignment",
+        "relation_counts": {
+          "split": 1
+        },
+        "ambiguous_groups": 0,
+        "optimal_alignments": 1,
+        "matches": [
+          {
+            "relation": "split",
+            "old_keys": [
+              "O1"
+            ],
+            "new_keys": [
+              "N1",
+              "N2",
+              "N3"
+            ],
+            "label_keys": [
+              "L1"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          }
+        ],
+        "groups": [
+          {
+            "station_id": "S1",
+            "class_label": "whoop",
+            "noise_layer": "quiet",
+            "labels_total": 1,
+            "detected_old": 1,
+            "detected_new": 1,
+            "splits_old": 0,
+            "splits_new": 1,
+            "additions": 0,
+            "unannotated_seconds": 0.0
+          }
+        ]
+      }
+    ]
+  }
+}

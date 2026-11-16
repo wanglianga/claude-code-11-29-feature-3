@@ -11,6 +11,7 @@ from . import __version__
 from .api import router
 from .config import settings
 from .db import init_db
+from .eval_api import router as eval_router
 
 
 @asynccontextmanager
@@ -49,6 +50,7 @@ async def _auth_middleware(request, call_next):
 
 
 app.include_router(router)
+app.include_router(eval_router)
 
 
 def custom_openapi():

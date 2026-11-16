@@ -1,0 +1,518 @@
+{
+  "scenario": "rain",
+  "title": "Rain noise layer: false positives grouped by layer, unannotated time listed separately",
+  "snapshot": {
+    "snapshot_key": "eval-rain",
+    "name": "雨天噪声（含未标注时段）",
+    "parser_version": "segment-parser/1.2.0",
+    "recognizer_versions": {
+      "old": "recognizer/1.4.0",
+      "new": "recognizer/2.0.0"
+    },
+    "recording_scopes": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:20:00Z"
+      }
+    ],
+    "noise_layers": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:10:00Z",
+        "layer": "quiet"
+      },
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:10:00Z",
+        "end": "2026-11-10T00:20:00Z",
+        "layer": "rain"
+      }
+    ],
+    "annotation_ranges": [
+      {
+        "station_id": "S1",
+        "start": "2026-11-10T00:00:00Z",
+        "end": "2026-11-10T00:15:00Z",
+        "annotator": "annotator-1"
+      }
+    ],
+    "labels": [
+      {
+        "label_key": "L1",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:01:40.0Z",
+        "end": "2026-11-10T00:01:41.5Z",
+        "annotator": "annotator-1"
+      },
+      {
+        "label_key": "L2",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:03:20.0Z",
+        "end": "2026-11-10T00:03:21.5Z",
+        "annotator": "annotator-1"
+      },
+      {
+        "label_key": "L3",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:11:40.0Z",
+        "end": "2026-11-10T00:11:41.5Z",
+        "annotator": "annotator-1",
+        "note": "in rain"
+      }
+    ],
+    "segments": [
+      {
+        "segment_key": "O1",
+        "version_role": "old",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:01:40.1Z",
+        "end": "2026-11-10T00:01:41.4Z",
+        "features": [
+          0.6,
+          0.2
+        ]
+      },
+      {
+        "segment_key": "O3",
+        "version_role": "old",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:11:40.2Z",
+        "end": "2026-11-10T00:11:41.4Z",
+        "features": [
+          0.6,
+          0.2
+        ]
+      },
+      {
+        "segment_key": "N1",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:01:40.1Z",
+        "end": "2026-11-10T00:01:41.4Z",
+        "features": [
+          0.6,
+          0.2
+        ]
+      },
+      {
+        "segment_key": "N2",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:03:19.9Z",
+        "end": "2026-11-10T00:03:21.6Z",
+        "features": [
+          0.6,
+          0.2
+        ]
+      },
+      {
+        "segment_key": "N3",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:11:40.2Z",
+        "end": "2026-11-10T00:11:41.4Z",
+        "features": [
+          0.6,
+          0.2
+        ]
+      },
+      {
+        "segment_key": "N4",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:12:30.0Z",
+        "end": "2026-11-10T00:12:30.8Z",
+        "features": [
+          0.9,
+          0.4
+        ]
+      },
+      {
+        "segment_key": "N5",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:12:40.0Z",
+        "end": "2026-11-10T00:12:40.6Z",
+        "features": [
+          0.9,
+          0.4
+        ]
+      },
+      {
+        "segment_key": "N6",
+        "version_role": "new",
+        "station_id": "S1",
+        "class_label": "croak",
+        "start": "2026-11-10T00:15:50.0Z",
+        "end": "2026-11-10T00:15:51.0Z",
+        "features": [
+          0.6,
+          0.2
+        ]
+      }
+    ]
+  },
+  "reports": [
+    {
+      "method": "alignment",
+      "publish": true,
+      "adopt": true
+    }
+  ],
+  "expect": {
+    "reports": [
+      {
+        "method": "alignment",
+        "relation_counts": {
+          "one_to_one": 2,
+          "new_only": 4
+        },
+        "ambiguous_groups": 0,
+        "optimal_alignments": 1,
+        "matches": [
+          {
+            "relation": "one_to_one",
+            "old_keys": [
+              "O1"
+            ],
+            "new_keys": [
+              "N1"
+            ],
+            "label_keys": [
+              "L1"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          },
+          {
+            "relation": "new_only",
+            "old_keys": [],
+            "new_keys": [
+              "N2"
+            ],
+            "label_keys": [
+              "L2"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          },
+          {
+            "relation": "one_to_one",
+            "old_keys": [
+              "O3"
+            ],
+            "new_keys": [
+              "N3"
+            ],
+            "label_keys": [
+              "L3"
+            ],
+            "ambiguous": false,
+            "alternatives": 1
+          },
+          {
+            "relation": "new_only",
+            "old_keys": [],
+            "new_keys": [
+              "N4"
+            ],
+            "label_keys": [],
+            "ambiguous": false,
+            "alternatives": 1
+          },
+          {
+            "relation": "new_only",
+            "old_keys": [],
+            "new_keys": [
+              "N5"
+            ],
+            "label_keys": [],
+            "ambiguous": false,
+            "alternatives": 1
+          },
+          {
+            "relation": "new_only",
+            "old_keys": [],
+            "new_keys": [
+              "N6"
+            ],
+            "label_keys": [],
+            "ambiguous": false,
+            "alternatives": 1
+          }
+        ],
+        "groups": [
+          {
+            "station_id": "S1",
+            "class_label": "croak",
+            "noise_layer": "quiet",
+            "labels_total": 2,
+            "detected_old": 1,
+            "detected_new": 2,
+            "missed_old": 1,
+            "missed_new": 0,
+            "additions": 1,
+            "false_positives_new": 0,
+            "unannotated_seconds": 0.0,
+            "unannotated_segments_new": 0
+          },
+          {
+            "station_id": "S1",
+            "class_label": "croak",
+            "noise_layer": "rain",
+            "labels_total": 1,
+            "detected_old": 1,
+            "detected_new": 1,
+            "missed_old": 0,
+            "missed_new": 0,
+            "additions": 0,
+            "false_positives_new": 2,
+            "unannotated_seconds": 300.0,
+            "unannotated_segments_new": 1
+          }
+        ],
+        "summary": {
+          "additions": 1,
+          "missed_old": 1,
+          "false_positives_new": 2,
+          "unannotated_seconds": 300.0
+        }
+      }
+    ]
+  },
+  "revision": {
+    "snapshot": {
+      "snapshot_key": "eval-rain-r2",
+      "name": "雨天噪声（补标修订）",
+      "parser_version": "segment-parser/1.2.0",
+      "recognizer_versions": {
+        "old": "recognizer/1.4.0",
+        "new": "recognizer/2.0.0"
+      },
+      "recording_scopes": [
+        {
+          "station_id": "S1",
+          "start": "2026-11-10T00:00:00Z",
+          "end": "2026-11-10T00:20:00Z"
+        }
+      ],
+      "noise_layers": [
+        {
+          "station_id": "S1",
+          "start": "2026-11-10T00:00:00Z",
+          "end": "2026-11-10T00:10:00Z",
+          "layer": "quiet"
+        },
+        {
+          "station_id": "S1",
+          "start": "2026-11-10T00:10:00Z",
+          "end": "2026-11-10T00:20:00Z",
+          "layer": "rain"
+        }
+      ],
+      "annotation_ranges": [
+        {
+          "station_id": "S1",
+          "start": "2026-11-10T00:00:00Z",
+          "end": "2026-11-10T00:20:00Z",
+          "annotator": "annotator-2"
+        }
+      ],
+      "labels": [
+        {
+          "label_key": "L1",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:01:40.0Z",
+          "end": "2026-11-10T00:01:41.5Z",
+          "annotator": "annotator-1"
+        },
+        {
+          "label_key": "L2",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:03:20.0Z",
+          "end": "2026-11-10T00:03:21.5Z",
+          "annotator": "annotator-1"
+        },
+        {
+          "label_key": "L3",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:11:40.0Z",
+          "end": "2026-11-10T00:11:41.5Z",
+          "annotator": "annotator-1",
+          "note": "in rain"
+        },
+        {
+          "label_key": "L4",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:15:49.8Z",
+          "end": "2026-11-10T00:15:51.2Z",
+          "annotator": "annotator-2",
+          "note": "supplementary annotation of the former unannotated tail"
+        }
+      ],
+      "segments": [
+        {
+          "segment_key": "O1",
+          "version_role": "old",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:01:40.1Z",
+          "end": "2026-11-10T00:01:41.4Z",
+          "features": [
+            0.6,
+            0.2
+          ]
+        },
+        {
+          "segment_key": "O3",
+          "version_role": "old",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:11:40.2Z",
+          "end": "2026-11-10T00:11:41.4Z",
+          "features": [
+            0.6,
+            0.2
+          ]
+        },
+        {
+          "segment_key": "N1",
+          "version_role": "new",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:01:40.1Z",
+          "end": "2026-11-10T00:01:41.4Z",
+          "features": [
+            0.6,
+            0.2
+          ]
+        },
+        {
+          "segment_key": "N2",
+          "version_role": "new",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:03:19.9Z",
+          "end": "2026-11-10T00:03:21.6Z",
+          "features": [
+            0.6,
+            0.2
+          ]
+        },
+        {
+          "segment_key": "N3",
+          "version_role": "new",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:11:40.2Z",
+          "end": "2026-11-10T00:11:41.4Z",
+          "features": [
+            0.6,
+            0.2
+          ]
+        },
+        {
+          "segment_key": "N4",
+          "version_role": "new",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:12:30.0Z",
+          "end": "2026-11-10T00:12:30.8Z",
+          "features": [
+            0.9,
+            0.4
+          ]
+        },
+        {
+          "segment_key": "N5",
+          "version_role": "new",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:12:40.0Z",
+          "end": "2026-11-10T00:12:40.6Z",
+          "features": [
+            0.9,
+            0.4
+          ]
+        },
+        {
+          "segment_key": "N6",
+          "version_role": "new",
+          "station_id": "S1",
+          "class_label": "croak",
+          "start": "2026-11-10T00:15:50.0Z",
+          "end": "2026-11-10T00:15:51.0Z",
+          "features": [
+            0.6,
+            0.2
+          ]
+        }
+      ],
+      "revision_of": "eval-rain"
+    },
+    "reports": [
+      {
+        "method": "alignment",
+        "publish": true,
+        "adopt": true
+      }
+    ],
+    "expect": {
+      "reports": [
+        {
+          "method": "alignment",
+          "groups": [
+            {
+              "station_id": "S1",
+              "class_label": "croak",
+              "noise_layer": "quiet",
+              "labels_total": 2,
+              "detected_old": 1,
+              "detected_new": 2,
+              "missed_old": 1,
+              "missed_new": 0,
+              "additions": 1,
+              "false_positives_new": 0,
+              "unannotated_seconds": 0.0,
+              "unannotated_segments_new": 0
+            },
+            {
+              "station_id": "S1",
+              "class_label": "croak",
+              "noise_layer": "rain",
+              "labels_total": 2,
+              "detected_old": 1,
+              "detected_new": 2,
+              "missed_old": 1,
+              "missed_new": 0,
+              "additions": 1,
+              "false_positives_new": 2,
+              "unannotated_seconds": 0.0,
+              "unannotated_segments_new": 0
+            }
+          ],
+          "summary": {
+            "additions": 2,
+            "unannotated_seconds": 0.0
+          }
+        }
+      ]
+    }
+  }
+}

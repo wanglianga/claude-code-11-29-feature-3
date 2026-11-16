@@ -3,7 +3,7 @@
   "info": {
     "title": "Wetland Multi-Station Acoustic Observation Service",
     "description": "Groups records of the same sound heard at several wetland stations into one event, using per-boot clock calibration, a coarse-to-fine grid search over the configured observation area, and an exclusive set-packing solver. Results are exploratory field-survey output, not an alerting service.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "x-results-are-exploratory": true
   },
   "paths": {
@@ -1641,10 +1641,825 @@
           }
         ]
       }
+    },
+    "/eval/snapshots": {
+      "get": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "List evaluation snapshots",
+        "operationId": "list_snapshots_eval_snapshots_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SnapshotOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Snapshots Eval Snapshots Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "Freeze an immutable evaluation snapshot",
+        "operationId": "post_snapshot_eval_snapshots_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SnapshotCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SnapshotOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/snapshots/{key}": {
+      "get": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "Snapshot detail incl. annotated/unannotated coverage",
+        "operationId": "get_snapshot_eval_snapshots__key__get",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SnapshotOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/snapshots/{key}/segments": {
+      "get": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "List recognizer segments of a snapshot",
+        "operationId": "list_segments_eval_snapshots__key__segments_get",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "version_role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(old|new)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version Role"
+            }
+          },
+          {
+            "name": "station_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Station Id"
+            }
+          },
+          {
+            "name": "class_label",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Class Label"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SegmentOut"
+                  },
+                  "title": "Response List Segments Eval Snapshots  Key  Segments Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/snapshots/{key}/labels": {
+      "get": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "List human labels of a snapshot",
+        "operationId": "list_labels_eval_snapshots__key__labels_get",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LabelOut"
+                  },
+                  "title": "Response List Labels Eval Snapshots  Key  Labels Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/snapshots/{key}/reports": {
+      "post": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "Compute a comparison report (next version in the series)",
+        "operationId": "post_report_eval_snapshots__key__reports_post",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/reports": {
+      "get": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "List evaluation reports",
+        "operationId": "list_reports_eval_reports_get",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Series Id"
+            }
+          },
+          {
+            "name": "snapshot_key",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Snapshot Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportOut"
+                  },
+                  "title": "Response List Reports Eval Reports Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/reports/{report_id}": {
+      "get": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "Report detail with per-station/class/noise-layer interval estimates",
+        "operationId": "get_report_eval_reports__report_id__get",
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/reports/{report_id}/matches": {
+      "get": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "Provenance: relation groups behind every reported number",
+        "operationId": "list_matches_eval_reports__report_id__matches_get",
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          },
+          {
+            "name": "station_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Station Id"
+            }
+          },
+          {
+            "name": "class_label",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Class Label"
+            }
+          },
+          {
+            "name": "noise_layer",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Noise Layer"
+            }
+          },
+          {
+            "name": "relation",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Relation"
+            }
+          },
+          {
+            "name": "ambiguous",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ambiguous"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MatchOut"
+                  },
+                  "title": "Response List Matches Eval Reports  Report Id  Matches Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/reports/{report_id}/matches/{group_key}": {
+      "get": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "One relation group with its equal-cost alternatives",
+        "operationId": "get_match_eval_reports__report_id__matches__group_key__get",
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          },
+          {
+            "name": "group_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Group Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/reports/{report_id}/publish": {
+      "post": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "Publish a report (immutable conclusion)",
+        "operationId": "publish_report_eval_reports__report_id__publish_post",
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/reports/{report_id}/adopt": {
+      "post": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "Adopt a published report as the series conclusion",
+        "operationId": "adopt_report_eval_reports__report_id__adopt_post",
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/eval/series/{series_id}/adopted": {
+      "get": {
+        "tags": [
+          "evaluation"
+        ],
+        "summary": "Adopted conclusions of a series, latest last",
+        "operationId": "adopted_reports_eval_series__series_id__adopted_get",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Series Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportOut"
+                  },
+                  "title": "Response Adopted Reports Eval Series  Series Id  Adopted Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
+      "AnnotationRangeIn": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "station_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Station Id"
+          },
+          "annotator": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Annotator"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "station_id",
+          "annotator"
+        ],
+        "title": "AnnotationRangeIn"
+      },
       "BatchResponse": {
         "properties": {
           "batch_id": {
@@ -2722,6 +3537,54 @@
         ],
         "title": "ExclusionOut"
       },
+      "GroupOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id"
+          },
+          "class_label": {
+            "type": "string",
+            "title": "Class Label"
+          },
+          "noise_layer": {
+            "type": "string",
+            "title": "Noise Layer"
+          },
+          "metrics": {
+            "type": "object",
+            "title": "Metrics"
+          },
+          "unannotated_seconds": {
+            "type": "number",
+            "title": "Unannotated Seconds"
+          },
+          "unannotated_segments_old": {
+            "type": "integer",
+            "title": "Unannotated Segments Old"
+          },
+          "unannotated_segments_new": {
+            "type": "integer",
+            "title": "Unannotated Segments New"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "station_id",
+          "class_label",
+          "noise_layer",
+          "metrics",
+          "unannotated_seconds",
+          "unannotated_segments_old",
+          "unannotated_segments_new"
+        ],
+        "title": "GroupOut"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -2792,6 +3655,247 @@
           "conflicts"
         ],
         "title": "IngestionCounts"
+      },
+      "LabelIn": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "label_key": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Label Key"
+          },
+          "station_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Station Id"
+          },
+          "class_label": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Class Label"
+          },
+          "annotator": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annotator"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "label_key",
+          "station_id",
+          "class_label"
+        ],
+        "title": "LabelIn"
+      },
+      "LabelOut": {
+        "properties": {
+          "label_key": {
+            "type": "string",
+            "title": "Label Key"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id"
+          },
+          "class_label": {
+            "type": "string",
+            "title": "Class Label"
+          },
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "annotator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annotator"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "noise_layer": {
+            "type": "string",
+            "title": "Noise Layer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label_key",
+          "station_id",
+          "class_label",
+          "start",
+          "end",
+          "annotator",
+          "note",
+          "noise_layer"
+        ],
+        "title": "LabelOut"
+      },
+      "MatchOut": {
+        "properties": {
+          "group_key": {
+            "type": "string",
+            "title": "Group Key"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id"
+          },
+          "class_label": {
+            "type": "string",
+            "title": "Class Label"
+          },
+          "noise_layer": {
+            "type": "string",
+            "title": "Noise Layer"
+          },
+          "relation": {
+            "type": "string",
+            "title": "Relation"
+          },
+          "ambiguous": {
+            "type": "boolean",
+            "title": "Ambiguous"
+          },
+          "old_keys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Old Keys"
+          },
+          "new_keys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "New Keys"
+          },
+          "label_keys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Label Keys"
+          },
+          "truth": {
+            "type": "object",
+            "title": "Truth"
+          },
+          "alternatives": {
+            "items": {},
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "group_key",
+          "station_id",
+          "class_label",
+          "noise_layer",
+          "relation",
+          "ambiguous",
+          "old_keys",
+          "new_keys",
+          "label_keys",
+          "truth",
+          "alternatives",
+          "start",
+          "end"
+        ],
+        "title": "MatchOut"
+      },
+      "NoiseLayerIn": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "station_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Station Id"
+          },
+          "layer": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Layer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "station_id",
+          "layer"
+        ],
+        "title": "NoiseLayerIn"
       },
       "ObservationBatch": {
         "properties": {
@@ -3145,6 +4249,29 @@
         ],
         "title": "ProgressUpload"
       },
+      "RecognizerVersions": {
+        "properties": {
+          "old": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Old"
+          },
+          "new": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "New"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "old",
+          "new"
+        ],
+        "title": "RecognizerVersions"
+      },
       "RegionOut": {
         "properties": {
           "region_id": {
@@ -3192,6 +4319,295 @@
           "representative"
         ],
         "title": "RegionOut"
+      },
+      "ReportCreate": {
+        "properties": {
+          "method": {
+            "type": "string",
+            "enum": [
+              "cluster",
+              "alignment"
+            ],
+            "title": "Method"
+          },
+          "params": {
+            "$ref": "#/components/schemas/ReportParams",
+            "default": {
+              "cluster_gap_us": 250000,
+              "feature_distance_limit": 0.25,
+              "skip_cost_us": 400000,
+              "reseg_penalty_us": 150000,
+              "align_max_gap_us": 250000,
+              "max_warp_us": 2000000,
+              "max_block": 4,
+              "max_alignments": 16,
+              "ci_level": 0.95
+            }
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "method"
+        ],
+        "title": "ReportCreate"
+      },
+      "ReportDetail": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "snapshot_id": {
+            "type": "integer",
+            "title": "Snapshot Id"
+          },
+          "snapshot_key": {
+            "type": "string",
+            "title": "Snapshot Key"
+          },
+          "series_id": {
+            "type": "integer",
+            "title": "Series Id"
+          },
+          "report_version": {
+            "type": "integer",
+            "title": "Report Version"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "params": {
+            "type": "object",
+            "title": "Params"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "adopted": {
+            "type": "boolean",
+            "title": "Adopted"
+          },
+          "adopted_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adopted At"
+          },
+          "summary": {
+            "type": "object",
+            "title": "Summary"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "idempotent_replay": {
+            "type": "boolean",
+            "title": "Idempotent Replay",
+            "default": false
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/GroupOut"
+            },
+            "type": "array",
+            "title": "Groups"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "snapshot_id",
+          "snapshot_key",
+          "series_id",
+          "report_version",
+          "method",
+          "params",
+          "status",
+          "adopted",
+          "adopted_at",
+          "summary",
+          "created_at",
+          "published_at",
+          "groups"
+        ],
+        "title": "ReportDetail"
+      },
+      "ReportOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "snapshot_id": {
+            "type": "integer",
+            "title": "Snapshot Id"
+          },
+          "snapshot_key": {
+            "type": "string",
+            "title": "Snapshot Key"
+          },
+          "series_id": {
+            "type": "integer",
+            "title": "Series Id"
+          },
+          "report_version": {
+            "type": "integer",
+            "title": "Report Version"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "params": {
+            "type": "object",
+            "title": "Params"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "adopted": {
+            "type": "boolean",
+            "title": "Adopted"
+          },
+          "adopted_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adopted At"
+          },
+          "summary": {
+            "type": "object",
+            "title": "Summary"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "idempotent_replay": {
+            "type": "boolean",
+            "title": "Idempotent Replay",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "snapshot_id",
+          "snapshot_key",
+          "series_id",
+          "report_version",
+          "method",
+          "params",
+          "status",
+          "adopted",
+          "adopted_at",
+          "summary",
+          "created_at",
+          "published_at"
+        ],
+        "title": "ReportOut"
+      },
+      "ReportParams": {
+        "properties": {
+          "cluster_gap_us": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Cluster Gap Us",
+            "default": 250000
+          },
+          "feature_distance_limit": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Feature Distance Limit",
+            "default": 0.25
+          },
+          "skip_cost_us": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Skip Cost Us",
+            "default": 400000
+          },
+          "reseg_penalty_us": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Reseg Penalty Us",
+            "default": 150000
+          },
+          "align_max_gap_us": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Align Max Gap Us",
+            "default": 250000
+          },
+          "max_warp_us": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Max Warp Us",
+            "default": 2000000
+          },
+          "max_block": {
+            "type": "integer",
+            "maximum": 8.0,
+            "minimum": 1.0,
+            "title": "Max Block",
+            "default": 4
+          },
+          "max_alignments": {
+            "type": "integer",
+            "maximum": 256.0,
+            "minimum": 1.0,
+            "title": "Max Alignments",
+            "default": 16
+          },
+          "ci_level": {
+            "type": "number",
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.5,
+            "title": "Ci Level",
+            "default": 0.95
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ReportParams",
+        "description": "Tunable costs/thresholds of a comparison run (frozen into the report)."
       },
       "RunOption": {
         "properties": {
@@ -3462,6 +4878,167 @@
         "type": "object",
         "title": "RunRequest"
       },
+      "ScopeIn": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "station_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Station Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "station_id"
+        ],
+        "title": "ScopeIn"
+      },
+      "SegmentIn": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "segment_key": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Segment Key"
+          },
+          "version_role": {
+            "type": "string",
+            "enum": [
+              "old",
+              "new"
+            ],
+            "title": "Version Role"
+          },
+          "station_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Station Id"
+          },
+          "class_label": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Class Label"
+          },
+          "features": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 128,
+            "minItems": 1,
+            "title": "Features"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "segment_key",
+          "version_role",
+          "station_id",
+          "class_label",
+          "features"
+        ],
+        "title": "SegmentIn"
+      },
+      "SegmentOut": {
+        "properties": {
+          "segment_key": {
+            "type": "string",
+            "title": "Segment Key"
+          },
+          "version_role": {
+            "type": "string",
+            "title": "Version Role"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id"
+          },
+          "class_label": {
+            "type": "string",
+            "title": "Class Label"
+          },
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "features": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Features"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "noise_layer": {
+            "type": "string",
+            "title": "Noise Layer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "segment_key",
+          "version_role",
+          "station_id",
+          "class_label",
+          "start",
+          "end",
+          "features",
+          "confidence",
+          "noise_layer"
+        ],
+        "title": "SegmentOut"
+      },
       "SelectOptionRequest": {
         "properties": {
           "option_id": {
@@ -3475,6 +5052,177 @@
           "option_id"
         ],
         "title": "SelectOptionRequest"
+      },
+      "SnapshotCreate": {
+        "properties": {
+          "snapshot_key": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Snapshot Key"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "parser_version": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Parser Version"
+          },
+          "recognizer_versions": {
+            "$ref": "#/components/schemas/RecognizerVersions"
+          },
+          "revision_of": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revision Of"
+          },
+          "recording_scopes": {
+            "items": {
+              "$ref": "#/components/schemas/ScopeIn"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Recording Scopes"
+          },
+          "noise_layers": {
+            "items": {
+              "$ref": "#/components/schemas/NoiseLayerIn"
+            },
+            "type": "array",
+            "title": "Noise Layers",
+            "default": []
+          },
+          "annotation_ranges": {
+            "items": {
+              "$ref": "#/components/schemas/AnnotationRangeIn"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Annotation Ranges"
+          },
+          "labels": {
+            "items": {
+              "$ref": "#/components/schemas/LabelIn"
+            },
+            "type": "array",
+            "title": "Labels",
+            "default": []
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/SegmentIn"
+            },
+            "type": "array",
+            "minItems": 2,
+            "title": "Segments"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "snapshot_key",
+          "name",
+          "parser_version",
+          "recognizer_versions",
+          "recording_scopes",
+          "annotation_ranges",
+          "segments"
+        ],
+        "title": "SnapshotCreate",
+        "description": "One immutable evaluation snapshot.\n\nThe whole payload is content-hashed; re-posting identical content under\nthe same ``snapshot_key`` is an idempotent replay, different content under\na used key is rejected.  Label revisions are a *new* snapshot with\n``revision_of`` pointing at the snapshot they revise."
+      },
+      "SnapshotOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "snapshot_key": {
+            "type": "string",
+            "title": "Snapshot Key"
+          },
+          "series_id": {
+            "type": "integer",
+            "title": "Series Id"
+          },
+          "revision_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revision Of"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "parser_version": {
+            "type": "string",
+            "title": "Parser Version"
+          },
+          "old_recognizer_version": {
+            "type": "string",
+            "title": "Old Recognizer Version"
+          },
+          "new_recognizer_version": {
+            "type": "string",
+            "title": "New Recognizer Version"
+          },
+          "content_hash": {
+            "type": "string",
+            "title": "Content Hash"
+          },
+          "counts": {
+            "type": "object",
+            "title": "Counts"
+          },
+          "coverage": {
+            "type": "object",
+            "title": "Coverage"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "idempotent_replay": {
+            "type": "boolean",
+            "title": "Idempotent Replay",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "snapshot_key",
+          "series_id",
+          "revision_of",
+          "name",
+          "parser_version",
+          "old_recognizer_version",
+          "new_recognizer_version",
+          "content_hash",
+          "counts",
+          "coverage",
+          "created_at"
+        ],
+        "title": "SnapshotOut"
       },
       "StationCreate": {
         "properties": {
